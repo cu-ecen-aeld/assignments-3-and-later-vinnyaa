@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 
 # verify the number of arguments that have been passed in

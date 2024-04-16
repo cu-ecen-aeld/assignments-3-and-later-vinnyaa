@@ -1,5 +1,6 @@
 # makefile for assignment 2 writer executable
-
+CC=	gcc
+OUTPUT= writer
 
 
 # if cross compile needed, preppend to cc command
