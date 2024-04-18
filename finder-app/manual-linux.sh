@@ -21,8 +21,6 @@ else
     echo "Using passed directory ${OUTDIR} for output"
 fi
 
-#OUTDIR=$(realpath ${OUTDIR})
-
 mkdir -p ${OUTDIR}
 
 if [ ! -d ${OUTDIR} ]
@@ -42,27 +40,24 @@ if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
     echo "Checking out version ${KERNEL_VERSION}"
     git checkout ${KERNEL_VERSION}
 
+
     # TODO: Add your kernel build steps here
     # vinnyaa kernal build, pretty much from the slides
-    #make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE mrproper
-    make ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- mrproper
-    #make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE defconfig
-    make ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- defconfig
-    #make ARCH=$ARCH CROSS_COMPILE=CROSS_COMPILE=${CROSS_COMPILE} all
-    make -j4 ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- all
+    make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} mrproper
+    make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} defconfig
+    make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} all
     #skipping because not enough memory by default
     #make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE modules
-    make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE dtbs
+    make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} dtbs
+    echo "Adding the Image in outdir"
+    # vinnyaa - add image to remove missing image error
+    cp ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ${OUTDIR}
 fi
 
-echo "Adding the Image in outdir"
-# vinnyaa - add image to remove missing image error
-cp ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ${OUTDIR}
-echo "here lies the image supposedly"
-ls ${OUTDIR}
+
 
 echo "Creating the staging directory for the root filesystem"
-cd "$OUTDIR"
+cd "${OUTDIR}"
 if [ -d "${OUTDIR}/rootfs" ]
 then
     echo "Deleting rootfs directory at ${OUTDIR}/rootfs and starting over"
@@ -71,31 +66,28 @@ fi
 
 # TODO: Create necessary base directories
 # vinnyaa root fs implementation
-mkdir -p ${OUTDIR}/rootfs
+mkdir -p rootfs
 cd "${OUTDIR}/rootfs"
-mkdir -p bin dev etc home lib lib64 proc sbin sys tmp usr var
+mkdir -p bin dev etc home lib lib64 proc root sbin sys tmp usr var
 mkdir -p usr/bin usr/lib usr/sbin
 mkdir -p var/log
 
-cd "$OUTDIR"
+
+cd "${OUTDIR}"
+echo "Make and install busybox"
 if [ ! -d "${OUTDIR}/busybox" ]
 then
 git clone git://busybox.net/busybox.git
     cd busybox
     git checkout ${BUSYBOX_VERSION}
-    # TODO:  Configure busybox
     make distclean
     make defconfig
-
 else
     cd busybox
 fi
-
-
-# TODO: Make and install busybox
-
-make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
-make CONFIG_PREFIX=${OUTDIR}/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
+make -j$(nproc) ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} 
+make -j$(nproc) ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} CONFIG_PREFIX=${OUTDIR}/rootfs install
+cd ${OUTDIR}/rootfs
 
 echo "Library dependencies"
 cd ${OUTDIR}/rootfs
@@ -106,9 +98,12 @@ ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 # vinnyaa library edits
 export SYSROOT=$(${CROSS_COMPILE}gcc --print-sysroot)
 cd "${OUTDIR}/rootfs"
-cp -a ${SYSROOT}/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64 #libc.so.6
-cp -a ${SYSROOT}/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64 #libresolv.so.2 
-cp -a ${SYSROOT}/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64 #libm.so.6
+
+sudo cp ${SYSROOT}/lib/ld-linux-aarch64.so.1 lib/ld-linux-aarch64.so.1
+
+sudo cp ${SYSROOT}/lib64/libm.so.6 lib64/libm.so.6
+sudo cp ${SYSROOT}/lib64/libresolv.so.2 lib64/libresolv.so.2
+sudo cp ${SYSROOT}/lib64/libc.so.6 lib64/libc.so.6
 
 
 # TODO: Make device nodes
