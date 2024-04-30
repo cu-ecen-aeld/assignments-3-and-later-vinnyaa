@@ -1,0 +1,191 @@
+==3033== Memcheck, a memory error detector
+==3033== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==3033== Using Valgrind-3.15.0-608cb11914-20190413 and LibVEX; rerun with -h for copyright info
+==3033== Command: ./aesdsocket
+==3033== Parent PID: 3031
+==3033== 
+--3033-- 
+--3033-- Valgrind options:
+--3033--    --error-exitcode=1
+--3033--    --leak-check=full
+--3033--    --show-leak-kinds=all
+--3033--    --track-origins=yes
+--3033--    --errors-for-leak-kinds=definite
+--3033--    --verbose
+--3033--    --log-file=valgrind-out.txt
+--3033-- Contents of /proc/version:
+--3033--   Linux version 5.15.0-105-generic (buildd@lcy02-amd64-054) (gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, GNU ld (GNU Binutils for Ubuntu) 2.34) #115~20.04.1-Ubuntu SMP Mon Apr 15 17:33:04 UTC 2024
+--3033-- 
+--3033-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-rdrand
+--3033-- Page sizes: currently 4096, max supported 4096
+--3033-- Valgrind library directory: /usr/lib/x86_64-linux-gnu/valgrind
+--3033-- Reading syms from /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket
+--3033-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-2.31.so
+--3033--   Considering /usr/lib/debug/.build-id/c9/a47e328eb2f1f41bcbcf31f9c11b9e17aa2a83.debug ..
+--3033--   .. build-id is valid
+--3033-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/memcheck-amd64-linux
+--3033--    object doesn't have a symbol table
+--3033--    object doesn't have a dynamic symbol table
+--3033-- Scheduler: using generic scheduler lock implementation.
+--3033-- Reading suppressions file: /usr/lib/x86_64-linux-gnu/valgrind/default.supp
+==3033== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-3033-by-vianders-on-???
+==3033== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-3033-by-vianders-on-???
+==3033== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-3033-by-vianders-on-???
+==3033== 
+==3033== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==3033== don't want to do, unless you know exactly what you're doing,
+==3033== or are doing some strange experiment):
+==3033==   /usr/lib/x86_64-linux-gnu/valgrind/../../bin/vgdb --pid=3033 ...command...
+==3033== 
+==3033== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==3033==   /path/to/gdb ./aesdsocket
+==3033== and then give GDB the following command
+==3033==   target remote | /usr/lib/x86_64-linux-gnu/valgrind/../../bin/vgdb --pid=3033
+==3033== --pid is optional if only one valgrind process is running
+==3033== 
+--3033-- REDIR: 0x4022e20 (ld-linux-x86-64.so.2:strlen) redirected to 0x580c9ce2 (???)
+--3033-- REDIR: 0x4022bf0 (ld-linux-x86-64.so.2:index) redirected to 0x580c9cfc (???)
+--3033-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_core-amd64-linux.so
+--3033--    object doesn't have a symbol table
+--3033-- Reading syms from /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so
+--3033--    object doesn't have a symbol table
+==3033== WARNING: new redirection conflicts with existing -- ignoring it
+--3033--     old: 0x04022e20 (strlen              ) R-> (0000.0) 0x580c9ce2 ???
+--3033--     new: 0x04022e20 (strlen              ) R-> (2007.0) 0x0483f060 strlen
+--3033-- REDIR: 0x401f600 (ld-linux-x86-64.so.2:strcmp) redirected to 0x483ffd0 (strcmp)
+--3033-- REDIR: 0x4023380 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4843a20 (mempcpy)
+--3033-- Reading syms from /usr/lib/x86_64-linux-gnu/libc-2.31.so
+--3033--   Considering /usr/lib/debug/.build-id/87/b331c034a6458c64ce09c03939e947212e18ce.debug ..
+--3033--   .. build-id is valid
+--3033-- REDIR: 0x48fe480 (libc.so.6:memmove) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd780 (libc.so.6:strncpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe7b0 (libc.so.6:strcasecmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd0a0 (libc.so.6:strcat) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd7e0 (libc.so.6:rindex) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48ffc50 (libc.so.6:rawmemchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x491ace0 (libc.so.6:wmemchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x491a820 (libc.so.6:wcscmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe5e0 (libc.so.6:mempcpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe410 (libc.so.6:bcmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd710 (libc.so.6:strncmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd150 (libc.so.6:strcmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe540 (libc.so.6:memset) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x491a7e0 (libc.so.6:wcschr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd670 (libc.so.6:strnlen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd230 (libc.so.6:strcspn) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe800 (libc.so.6:strncasecmp) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd1d0 (libc.so.6:strcpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe950 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x491bf50 (libc.so.6:wcsnlen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x491a860 (libc.so.6:wcscpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd820 (libc.so.6:strpbrk) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd100 (libc.so.6:index) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fd630 (libc.so.6:strlen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x4906bb0 (libc.so.6:memrchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe850 (libc.so.6:strcasecmp_l) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe3d0 (libc.so.6:memchr) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x491a930 (libc.so.6:wcslen) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fdae0 (libc.so.6:strspn) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe750 (libc.so.6:stpncpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe6f0 (libc.so.6:stpcpy) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48ffc90 (libc.so.6:strchrnul) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x48fe8a0 (libc.so.6:strncasecmp_l) redirected to 0x48311d0 (_vgnU_ifunc_wrapper)
+--3033-- REDIR: 0x49e6730 (libc.so.6:__strrchr_avx2) redirected to 0x483ea10 (rindex)
+--3033-- REDIR: 0x49e1df0 (libc.so.6:__strcmp_avx2) redirected to 0x483fed0 (strcmp)
+--3033-- REDIR: 0x49e9d90 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x48428e0 (memset)
+==3033== Syscall param rt_sigaction(act->sa_mask) points to uninitialised byte(s)
+==3033==    at 0x48A1166: __libc_sigaction (sigaction.c:58)
+==3033==    by 0x1095E6: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033==  Address 0x1ffefc1368 is on thread 1's stack
+==3033==  in frame #0, created by __libc_sigaction (sigaction.c:43)
+==3033==  Uninitialised value was created by a stack allocation
+==3033==    at 0x109516: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033== 
+==3033== Syscall param rt_sigaction(act->sa_flags) points to uninitialised byte(s)
+==3033==    at 0x48A1166: __libc_sigaction (sigaction.c:58)
+==3033==    by 0x1095E6: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033==  Address 0x1ffefc1358 is on thread 1's stack
+==3033==  in frame #0, created by __libc_sigaction (sigaction.c:43)
+==3033==  Uninitialised value was created by a stack allocation
+==3033==    at 0x109516: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033== 
+==3033== Syscall param rt_sigaction(act->sa_mask) points to uninitialised byte(s)
+==3033==    at 0x48A1166: __libc_sigaction (sigaction.c:58)
+==3033==    by 0x1095FF: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033==  Address 0x1ffefc1368 is on thread 1's stack
+==3033==  in frame #0, created by __libc_sigaction (sigaction.c:43)
+==3033==  Uninitialised value was created by a stack allocation
+==3033==    at 0x109516: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033== 
+==3033== Syscall param rt_sigaction(act->sa_flags) points to uninitialised byte(s)
+==3033==    at 0x48A1166: __libc_sigaction (sigaction.c:58)
+==3033==    by 0x1095FF: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033==  Address 0x1ffefc1358 is on thread 1's stack
+==3033==  in frame #0, created by __libc_sigaction (sigaction.c:43)
+==3033==  Uninitialised value was created by a stack allocation
+==3033==    at 0x109516: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033== 
+--3033-- REDIR: 0x49e6540 (libc.so.6:__strchrnul_avx2) redirected to 0x4843540 (strchrnul)
+--3033-- REDIR: 0x49e7e40 (libc.so.6:__strcpy_avx2) redirected to 0x483f090 (strcpy)
+--3033-- REDIR: 0x48f80e0 (libc.so.6:malloc) redirected to 0x483b780 (malloc)
+--3033-- REDIR: 0x48f9b10 (libc.so.6:calloc) redirected to 0x483dce0 (calloc)
+--3033-- REDIR: 0x49e6900 (libc.so.6:__strlen_avx2) redirected to 0x483ef40 (strlen)
+--3033-- REDIR: 0x48f86d0 (libc.so.6:free) redirected to 0x483c9d0 (free)
+--3033-- REDIR: 0x49e9910 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x48429f0 (memmove)
+--3033-- REDIR: 0x48fdfa0 (libc.so.6:__GI_strstr) redirected to 0x4843ca0 (__strstr_sse2)
+--3033-- REDIR: 0x49e2ef0 (libc.so.6:__memcmp_avx2_movbe) redirected to 0x48421e0 (bcmp)
+--3033-- REDIR: 0x49e98f0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4843660 (mempcpy)
+--3033-- REDIR: 0x48f8e80 (libc.so.6:realloc) redirected to 0x483df30 (realloc)
+==3033== Warning: invalid file descriptor -1 in syscall close()
+==3033==    at 0x496CA37: close (close.c:27)
+==3033==    by 0x109495: closingtime (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033==    by 0x10975B: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033== 
+==3033== HEAP SUMMARY:
+==3033==     in use at exit: 0 bytes in 0 blocks
+==3033==   total heap usage: 43 allocs, 43 frees, 102,444 bytes allocated
+==3033== 
+==3033== All heap blocks were freed -- no leaks are possible
+==3033== 
+==3033== ERROR SUMMARY: 4 errors from 4 contexts (suppressed: 0 from 0)
+==3033== 
+==3033== 1 errors in context 1 of 4:
+==3033== Syscall param rt_sigaction(act->sa_flags) points to uninitialised byte(s)
+==3033==    at 0x48A1166: __libc_sigaction (sigaction.c:58)
+==3033==    by 0x1095FF: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033==  Address 0x1ffefc1358 is on thread 1's stack
+==3033==  in frame #0, created by __libc_sigaction (sigaction.c:43)
+==3033==  Uninitialised value was created by a stack allocation
+==3033==    at 0x109516: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033== 
+==3033== 
+==3033== 1 errors in context 2 of 4:
+==3033== Syscall param rt_sigaction(act->sa_mask) points to uninitialised byte(s)
+==3033==    at 0x48A1166: __libc_sigaction (sigaction.c:58)
+==3033==    by 0x1095FF: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033==  Address 0x1ffefc1368 is on thread 1's stack
+==3033==  in frame #0, created by __libc_sigaction (sigaction.c:43)
+==3033==  Uninitialised value was created by a stack allocation
+==3033==    at 0x109516: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033== 
+==3033== 
+==3033== 1 errors in context 3 of 4:
+==3033== Syscall param rt_sigaction(act->sa_flags) points to uninitialised byte(s)
+==3033==    at 0x48A1166: __libc_sigaction (sigaction.c:58)
+==3033==    by 0x1095E6: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033==  Address 0x1ffefc1358 is on thread 1's stack
+==3033==  in frame #0, created by __libc_sigaction (sigaction.c:43)
+==3033==  Uninitialised value was created by a stack allocation
+==3033==    at 0x109516: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033== 
+==3033== 
+==3033== 1 errors in context 4 of 4:
+==3033== Syscall param rt_sigaction(act->sa_mask) points to uninitialised byte(s)
+==3033==    at 0x48A1166: __libc_sigaction (sigaction.c:58)
+==3033==    by 0x1095E6: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033==  Address 0x1ffefc1368 is on thread 1's stack
+==3033==  in frame #0, created by __libc_sigaction (sigaction.c:43)
+==3033==  Uninitialised value was created by a stack allocation
+==3033==    at 0x109516: main (in /home/vianders/Documents/ecen5305/assignment-1-vinnyaa/server/aesdsocket)
+==3033== 
+==3033== ERROR SUMMARY: 4 errors from 4 contexts (suppressed: 0 from 0)
