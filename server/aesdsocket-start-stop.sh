@@ -5,7 +5,7 @@ case "$1" in
 		echo "Starting aesd server"
 		start-stop-daemon -S -n aesdsocket /usr/bin/aesdsocket -- -d
 		;;
-	stop
+	stop)
 		echo "stopping aesd server"
 		start-stop daemon -K -n aesdsocket
 		;;
