@@ -1,13 +1,13 @@
 # makefile for assignment 5 aesdsocket executable
-CC ?=	$(CROSS_COMPILE)gcc
+CC ?= gcc
 TARGET ?= aesdsocket
 TARGET_LDFLAGS ?= -lpthread -lrt
 
 
-# if cross compile needed, preppend to cc command
-#ifdef CROSS_COMPILE
-#    CC ?= $(CROSS_COMPILE)$(CC)
-#endif
+## if cross compile needed, preppend to cc command
+ifdef CROSS_COMPILE
+    CC ?= $(CROSS_COMPILE)$(CC)
+endif
 
 aesdsocket: aesdsocket.c
 	$(CC) aesdsocket.c $(TARGET_LDFLAGS) -o $(TARGET)
