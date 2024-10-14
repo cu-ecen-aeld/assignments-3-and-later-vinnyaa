@@ -15,7 +15,13 @@
 #include <sys/mman.h>
 
 #define WAITING_CONNS 20
-#define buff_file_path "/var/tmp/aesdsocketdata"
+
+#ifdef USE_AESD_CHAR_DEVICE
+	#define buff_file_path "/dev/aesdchar"
+#else
+	#define buff_file_path "/var/tmp/aesdsocketdata"
+#endif
+
 
 bool exitflag = false;
 bool daemonflag = false;

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		echo "Starting aesd-char"
+		aesdchar_load
+		;;
+	stop)
+		echo "stopping aesd-char"
+		aesdchar_unload
+		;;
+	*)
+		echo "Useage: $0 {start | stop}"
+	exit 1
+esac
+
+exit 0
