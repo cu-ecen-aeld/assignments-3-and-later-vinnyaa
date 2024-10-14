@@ -16,6 +16,8 @@
 
 #include "aesd-circular-buffer.h"
 
+
+
 /**
  * @param buffer the buffer to search for corresponding offset.  Any necessary locking must be performed by caller.
  * @param char_offset the position to search for in the buffer list, describing the zero referenced
@@ -29,9 +31,40 @@
 struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct aesd_circular_buffer *buffer,
             size_t char_offset, size_t *entry_offset_byte_rtn )
 {
+    size_t countdown = char_offset;
+    uint8_t index = buffer->out_offs;
     /**
     * TODO: implement per description
     */
+    if(buffer->full) {
+        if(countdown < buffer->entry[index].size){
+            *entry_offset_byte_rtn = countdown;
+            return &(buffer->entry[index]);
+        } else {
+            countdown -= buffer->entry[index].size;
+            index++;
+            if(index>= AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED) {
+                index = 0;
+            }
+        }
+    }
+
+
+    while(index != buffer->in_offs) {
+        if(buffer->entry[index].size > countdown) {
+            *entry_offset_byte_rtn = countdown;
+            return &(buffer->entry[index]);
+        } else {
+            countdown-=buffer->entry[index].size;
+            index++;
+            if(index>= AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED) {
+                index = 0;
+            }
+        }
+
+    }
+ 
+
     return NULL;
 }
 
@@ -47,6 +80,22 @@ void aesd_circular_buffer_add_entry(struct aesd_circular_buffer *buffer, const s
     /**
     * TODO: implement per description
     */
+    if(buffer->full) {
+        buffer->out_offs++;
+        if(buffer->out_offs >= AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED) {
+            buffer->out_offs = 0;
+        }
+    }
+    buffer->entry[buffer->in_offs] = *add_entry;
+    buffer->in_offs++;
+    if(buffer->in_offs >= AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED) {
+        buffer->in_offs = 0;
+    }
+    if(buffer->in_offs == buffer->out_offs) {
+        buffer->full = true;
+    } else {
+        buffer->full = false;
+    }
 }
 
 /**

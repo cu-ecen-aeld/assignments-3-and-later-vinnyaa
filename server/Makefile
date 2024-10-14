@@ -1,23 +1,33 @@
 # makefile for assignment 5 aesdsocket executable
-CC?=	${CROSS_COMPILE}gcc
-OUTPUT?= aesdsocket
-LDFLAGS ?= -lpthread -lrt
+
+CC ?= gcc
+TARGET ?= aesdsocket
+TARGET_LDFLAGS ?= -lpthread -lrt
+
+USE_AESD_CHAR_DEVICE ?=1
+
+C
 
 default: all
 
-all: $(OUTPUT)
-# if cross compile needed, preppend to cc command
+
+## if cross compile needed, preppend to cc command
+
 ifdef CROSS_COMPILE
-    CC := $(CROSS_COMPILE)$(CC)
+    CC ?= $(CROSS_COMPILE)$(CC)
 endif
 
-$(OUTPUT): aesdsocket.c
-	$(CC) aesdsocket.c $(LDFLAGS) -o aesdsocket
+
+aesdsocket: aesdsocket.c
+	$(CC) aesdsocket.c $(TARGET_LDFLAGS) -o $(TARGET)
+
 
 
 # default build case
 all: aesdsocket.c
-	$(CC) aesdsocket.c $(LDFLAGS) -o aesdsocket
+
+	$(CC) aesdsocket.c $(TARGET_LDFLAGS) -o $(TARGET)
 
 clean:
-	rm -rf *.o $(OUPUT)
+	rm -rf *.o $(TARGET)
+
