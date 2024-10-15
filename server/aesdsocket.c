@@ -10,6 +10,7 @@
 #include <pthread.h>
 #include <sys/queue.h>
 #include <time.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include "../aesd-char-driver/aesd_ioctl.h"
 
