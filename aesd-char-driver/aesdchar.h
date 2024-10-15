@@ -32,7 +32,7 @@ struct aesd_dev
      * working entry for aesdbuffer (for writes before \n)
      * locking primitive (mutex?)
      */
-     struct aesd_buffer_entry temp_entry;
+     struct aesd_buffer_entry *temp_entry;
      struct mutex lock;
      struct aesd_circular_buffer *circ_buffer;
      struct cdev cdev;     /* Char device structure      */
