@@ -76,7 +76,7 @@ ssize_t aesd_read(struct file *filp, char __user *buf, size_t count,
     }
     
     //reading buffer from user space to kernal space
-    temp_entry = aesd_circular_buffer_find_entry_offset_for_fpos(dev->circ_buffer, *f_pos, &read_offset);
+    temp_entry = aesd_circular_buffer_find_entry_offset_for_fpos(&dev->circ_buffer, *f_pos, &read_offset);
     if(temp_entry) {
 	size_t to_copy = min(count, temp_entry->size - read_offset);
 	if(copy_to_user(buf, temp_entry->buffptr + read_offset, to_copy)) {
@@ -98,7 +98,7 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
 {
     ssize_t retval = 0;
     struct aesd_dev *dev = filp->private_data;
-    char *unadded_buff_ptr;
+    //char *unadded_buff_ptr;
     struct aesd_buffer_entry resized_entry;
     PDEBUG("write %zu bytes with offset %lld",count,*f_pos);
     /**
@@ -112,41 +112,41 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
     
     // if no entry has been made to the circle buffer, try to allocate memory
     // if not enough memory available, set error as -ENOMEM
-    if(dev->temp_entry->size == 0) {
-    	dev->temp_entry->buffptr = kmalloc(count, GFP_KERNEL);
-    	if(dev->temp_entry->buffptr == NULL) {
+    if(dev->temp_entry.size == 0) {
+    	dev->temp_entry.buffptr = kmalloc(count, GFP_KERNEL);
+    	if(dev->temp_entry.buffptr == NULL) {
     	    retval = -ENOMEM;
     	    mutex_unlock(&dev->lock);
     	    return retval;
     	}
-    	dev->temp_entry->size = 0;
+    	dev->temp_entry.size = 0;
     } else {
     	// place holder element to try to insert another element to aesd_circlebuffer
-    	char *temp_buff_pointer = krealloc(dev->temp_entry->buffptr, dev->temp_entry->size + count, GFP_KERNEL);
+    	char *temp_buff_pointer = krealloc(dev->temp_entry.buffptr, dev->temp_entry.size + count, GFP_KERNEL);
     	if(temp_buff_pointer == NULL) {
     	    retval = -ENOMEM;
     	    mutex_unlock(&dev->lock);
     	    return retval;
     	}
-    	dev->temp_entry->buffptr = temp_buff_pointer;
+    	dev->temp_entry.buffptr = temp_buff_pointer;
     }
     
     // actually copy from user space into kernal mode
-    if(copy_from_user((void *)(dev->temp_entry->buffptr + dev->temp_entry->size), buf, count)) {
+    if(copy_from_user((void *)(dev->temp_entry.buffptr + dev->temp_entry.size), buf, count)) {
         retval = -EFAULT;
         mutex_unlock(&dev->lock);
         return retval;
     }
     
     // update buffer element size, since if statement did not trigger, copy_from_user completed
-    dev->temp_entry->size += count;
+    dev->temp_entry.size += count;
     
     // data is now in kernel space, now we can move it to the aesd circle buffer
 
     // can I find a newline character within the buffer entry?
-    if(dev->temp_entry->buffptr[dev->temp_entry->size-1] == '\n') {
+    if(dev->temp_entry.buffptr[dev->temp_entry.size-1] == '\n') {
         // new location for the end of the buffer text entry should be considered
-        resized_entry.buffptr = kmalloc(dev->temp_entry->size, GFP_KERNEL);
+        resized_entry.buffptr = kmalloc(dev->temp_entry.size, GFP_KERNEL);
 
         if(!resized_entry.buffptr) {
             retval = -ENOMEM;
@@ -155,11 +155,11 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
         }
 
         // kmalloc success, i can move the data to the new temp place
-        memcpy((void *)resized_entry.buffptr, dev->temp_entry->buffptr, dev->temp_entry->size);
-        resized_entry.size = dev->temp_entry->size;
+        memcpy((void *)resized_entry.buffptr, dev->temp_entry.buffptr, dev->temp_entry.size);
+        resized_entry.size = dev->temp_entry.size;
 
         //unadded_buff_ptr = 
-        aesd_circular_buffer_add_entry(dev->circ_buffer, &resized_entry);
+        aesd_circular_buffer_add_entry(&dev->circ_buffer, &resized_entry);
 
 
         // if a valid pointer is returned, the entry will overwrite an entry added.
@@ -169,9 +169,9 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
         //}
 
         // temp entry is created, now replace temp_entry buffer pointer and free previous memory
-        dev->temp_entry->size = 0;
-        kfree(dev->temp_entry->buffptr);
-        dev->temp_entry->buffptr = NULL;
+        dev->temp_entry.size = 0;
+        kfree(dev->temp_entry.buffptr);
+        dev->temp_entry.buffptr = NULL;
     }
     
     retval = count;
@@ -220,11 +220,13 @@ int aesd_init_module(void)
     /**
      * DONE: initialize the AESD specific portion of the device
      */
-    aesd_circular_buffer_init(aesd_device.circ_buffer);
+    aesd_circular_buffer_init(&aesd_device.circ_buffer);
+
+
+    mutex_init(&aesd_device.lock);
+
 
     result = aesd_setup_cdev(&aesd_device);
-
-
     if( result ) {
         unregister_chrdev_region(dev, 1);
     }
@@ -244,7 +246,7 @@ void aesd_cleanup_module(void)
      * DONE: cleanup AESD specific poritions here as necessary
      */
 
-    AESD_CIRCULAR_BUFFER_FOREACH(it_entry, aesd_device.circ_buffer, index) {
+    AESD_CIRCULAR_BUFFER_FOREACH(it_entry, &aesd_device.circ_buffer, index) {
         kfree(it_entry->buffptr);
     }
 
