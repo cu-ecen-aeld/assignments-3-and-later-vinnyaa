@@ -6,7 +6,6 @@ TARGET_LDFLAGS ?= -lpthread -lrt
 
 USE_AESD_CHAR_DEVICE ?=1
 
-C
 
 default: all
 
