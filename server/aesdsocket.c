@@ -11,6 +11,7 @@
 #include <sys/queue.h>
 #include <time.h>
 #include <stdint.h>
+#include "../aesd-char-driver/aesd_ioctl.h"
 
 #define buffer_len 1024
 #define DELAY_TIME 10
@@ -53,12 +54,12 @@ void vin_signal_handler(int sig) {
     struct vin_slist_node *sig_snode = NULL;
 
     if ((SIGINT == sig) || (SIGTERM == sig)) {	
-        syslog(LOG_INFO, "\n=============Caught signal, set to start exiting\n");
+        //syslog(LOG_INFO, "\n=============Caught signal, set to start exiting\n");
         while(!SLIST_EMPTY(&vin_head)) {
             sig_snode = SLIST_FIRST(&vin_head);
             if (pthread_join(sig_snode->vin_thread_id, NULL) != 0)
             {
-                syslog(LOG_ERR, "pthread_join Failed!\n");
+                //syslog(LOG_ERR, "pthread_join Failed!\n");
                 closelog();
                 exit(-1);
             }
@@ -73,13 +74,13 @@ void vin_signal_handler(int sig) {
         }
 
         if (remove(aesd_file) != 0) {
-            syslog(LOG_ERR, "Failed to delete temp file");
+            //syslog(LOG_ERR, "Failed to delete temp file");
             closelog();
             exit(-1);
         }
         
         if (timer_delete(timer_id) != 0) {
-            syslog(LOG_ERR, "failed to delete timer");
+            //syslog(LOG_ERR, "failed to delete timer");
             closelog();
             exit(-1);
         }
@@ -90,13 +91,14 @@ void vin_signal_handler(int sig) {
 }
 
 
-
+// assignment 9 adapt function to include ioctl
 void* proc_thread_func(void* args)
 {
     struct vin_thread_data* local_thread_data = (struct vin_thread_data *) args;
     char *vin_buffer = NULL;
     int thread_rec;
     FILE *thread_write_file = NULL;
+    bool ioctl_received = false;
     unsigned char exitflag;
     
 	//syslog(LOG_ERR, "------------------pthread hallo---------");
@@ -105,14 +107,14 @@ void* proc_thread_func(void* args)
     
     thread_rec = pthread_mutex_lock(&file_mutex);
     if (thread_rec != 0) {
-        syslog(LOG_ERR, "failed to lock mutex");
+        //syslog(LOG_ERR, "failed to lock mutex");
         close(local_thread_data->vin_conn_fd);
         local_thread_data->thread_completed = -1;
         return local_thread_data;
     } else {
         thread_write_file = fopen(aesd_file, "a");
         if (thread_write_file == NULL){
-			syslog(LOG_ERR, "failed to open write file from thread");
+			//syslog(LOG_ERR, "failed to open write file from thread");
             close(local_thread_data->vin_conn_fd);
             local_thread_data->thread_completed = -1;
             return local_thread_data;
@@ -137,16 +139,35 @@ void* proc_thread_func(void* args)
             }
             
             if (bytes_recv > 0) {
-                if (fwrite(vin_buffer, 1, bytes_recv, thread_write_file) != bytes_recv) {
-                    syslog(LOG_ERR, "Write to File Failed!\n");
-                    fclose(thread_write_file);
-                    free(vin_buffer);
-                    close(local_thread_data->vin_conn_fd);
-                    local_thread_data->thread_completed = -1;
-                    return local_thread_data;
+            	if (strncmp(vin_buffer, "AESDCHAR_IOCSEEKTO:", 19) == 0) {
+            	    // this chould be a seekto command
+            	    ioctl_received = true;
+            	    unsigned int x;
+            	    unsigned int y;
+            	    if (sscanf(vin_buffer + 19, "%u,%u", &x, &y) == 2) {
+            	        struct aesd_seekto seekto;
+            	        seekto.write_cmd = x;
+            	        seekto.write_cmd_offset = y;
+            	        if(ioctl(fileno(thread_write_file),AESDCHAR_IOCSEEKTO, &seekto) == -1) {
+            	            //ioctl failed, 
+            	            //syslog(LOG_ERR, "ioctl filaed");
+            	        }
+            	    }
+            	}
+                if (!ioctl_received) {
+                    if (fwrite(vin_buffer, 1, bytes_recv, thread_write_file) != bytes_recv) {
+                        //syslog(LOG_ERR, "Write to File Failed!\n");
+                        fclose(thread_write_file);
+                        free(vin_buffer);
+                        close(local_thread_data->vin_conn_fd);
+                        local_thread_data->thread_completed = -1;
+                        return local_thread_data;
+                    }
                 }
-				//syslog(LOG_ERR, "------------------pthread has data---------%s", vin_buffer);
+                
+		//syslog(LOG_ERR, "------------------pthread has data---------%s", vin_buffer);
             }
+            
         }
         fclose(thread_write_file);
         free(vin_buffer);
@@ -169,7 +190,7 @@ void* proc_thread_func(void* args)
     {
         thread_write_file = fopen(aesd_file, "r");
         if (thread_write_file == NULL) {
-            syslog(LOG_ERR, "Failed to open write file from thread");
+            //syslog(LOG_ERR, "Failed to open write file from thread");
             close(local_thread_data->vin_conn_fd);
             local_thread_data->thread_completed = -1;
             return local_thread_data;

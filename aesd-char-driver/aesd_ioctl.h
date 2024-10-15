@@ -1,4 +1,4 @@
-/*
+/*Add custom seek support to your driver using the llseek file_operations function.  Your seek implementation should:
  * aesd_ioctl.h
  *
  *  Created on: Oct 23, 2019

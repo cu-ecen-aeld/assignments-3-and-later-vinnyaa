@@ -21,6 +21,7 @@
 #include "aesd-circular-buffer.h"
 #include <linux/slab.h>
 #include <linux/mutex.h>
+#include "aesd_ioctl.h"
 
 int aesd_major =   0; // use dynamic major
 int aesd_minor =   0;
@@ -180,12 +181,123 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
     mutex_unlock(&dev->lock);
     return retval;
 }
+
+
+//assigment 9 additions
+
+static loff_t aesd_llseek(struct file *filp, loff_t off, int whence) {
+    struct aesd_dev *dev = filp->private_data;
+    loff tmp_pos = 0;
+    loff_t buff_size;
+    size_t buff_offset;
+    size_t index;
+    
+    if(mutex_lock_interruptible(&dev->lock)) {
+        return -ERESTARTSYS;
+    }
+    
+    buff_size = 0;
+    for(index = 0; i< AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED; index++) {
+        buff_size += dev->circ_buffer.temp_entry[index].size;
+    }
+    
+    
+    switch (whence) {
+        case SEEK_SET:
+            tmp_pos = off;
+            break;
+        
+        case SEEK_CUR:
+            tmp_pos = filp->fpos + off;
+            break;
+        
+        case SEEK_END:
+            tmp_pos = buff_size + off;
+            break;
+        
+        default:
+            mutex_unlock(&dev->lock);
+            return -ERESTARTSYS;
+    }
+    
+    if (tmp_pos < 0 || tmp_pos > buff_size) {
+        mutex_unlock(&dev->lock);
+        return -EINVAL;
+    }
+    
+    filp->fpos = tmp_pos;
+    mutex_unlock(&dev->lock);
+    return tmp_pos;
+
+}
+
+//assignment 9 additions
+long aesd_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned long arg) {
+
+    struct aesd_dev *dev = filp->private_data;
+    struct aesd_seekto seekto;
+    size_t offset;
+    loff_t tmp_pos = 0;
+    loff_t buff_pos = 0;
+    int retval = 0;
+    int index = 0;
+    
+    
+    if (_IOC_TYPE(cmd) != AESD_IOC_MAGIC || _IOC_NR(cmd) > AESDCHAR_IOC_MAXNR) {
+        // cmd is not matching aesd value of 16, dont continue further
+        return -ENOTTY;
+    
+    }   
+    
+    // mutex must lock to continue
+    if (mutex_lock_interruptible(&dev->lock)) {
+        return -ERESTARTSYS;
+    }
+    
+    switch (cmd) {
+        case AESDCHAR_IOCSEEKTO:
+            if (copy_from_user(&seekto, (const void __user *)arg, sizeof(seekto))) {
+                mutex_unlock(&dev->lock);
+                return -EFAULT;
+            }
+            
+            if (seekto.write_cmd >= AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED || dev->circ_buffer.temp_entry[seekto.write_cmd].size == 0) {
+                mutex_unlock(&dev->lock);
+                return -EINVAL;
+            }
+            
+            if (seekto.write_cmd_offset >= dev->circ_buffer.temp_entry[seekto.write_cmd].size) {
+                mutex_unlock(&dev->lock);
+                return -EINVAL;
+            }
+            
+            for (index = 0; index < seekto.write_cmd; index++) {
+                buff_pos += dev->circular_buffer.temp_entry[index].size;
+            }
+            temp_pos = buff_pos + seekto.write_cmd_offset;
+            
+            filp->fpos = tmp_pos;
+            retval = tmp_pos;
+            break;
+            
+        default:
+            mutex_unlock(&dev->lock);
+            return -EINVAL;
+    }
+    
+    
+}    
+
+
+
 struct file_operations aesd_fops = {
     .owner =    THIS_MODULE,
     .read =     aesd_read,
     .write =    aesd_write,
     .open =     aesd_open,
     .release =  aesd_release,
+    .llseek = aesd_llseek,
+    .unlocked_ioctl = aesd_unlocked_ioctl,
 };
 
 static int aesd_setup_cdev(struct aesd_dev *dev)
