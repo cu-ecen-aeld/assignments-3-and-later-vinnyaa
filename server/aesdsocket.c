@@ -280,7 +280,7 @@ void time_keeper(int sig, siginfo_t *who, void *cares) {
                 exit(-1);
             }
             
-            fprintf(time_write_file, "%s", timestamp_string);
+            //fprintf(time_write_file, "%s", timestamp_string);
             
             fclose(time_write_file);
             time_rec = pthread_mutex_unlock(&file_mutex);
